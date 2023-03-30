@@ -9,6 +9,12 @@ def source():
     TaxPayer('foo', 'bar').get_prof_picture(request.args["input"])
 ### Unrelated to the exercise -- Ends here -- Please ignore
 
+def valid_path(path=None):
+    return os.path.exists(path)
+
+def accessible_file(path=None):
+    return path in ["assets/tax_form.pdf", "assets/prof_picture.png"]
+
 class TaxPayer:
     
     def __init__(self, username, password):
@@ -24,13 +30,13 @@ class TaxPayer:
             pass
         
         # defends against path traversal attacks
-        if path.startswith('/') or path.startswith('..'):
-            return None
+        if not valid_path(path) or not accessible_file(path):
+            raise Exception("Error: Invalid or Inaccessible path")
         
         # builds path
         base_dir = os.path.dirname(os.path.abspath(__file__))
         prof_picture_path = os.path.normpath(os.path.join(base_dir, path))
-    
+        
         with open(prof_picture_path, 'rb') as pic:
             picture = bytearray(pic.read())
 
@@ -44,6 +50,10 @@ class TaxPayer:
         if not path:
             raise Exception("Error: Tax form is required for all users")
        
+        # defends against path traversal attacks
+        if not valid_path(path) or not accessible_file(path):
+            raise Exception("Error: Invalid or Inaccessible path")
+
         with open(path, 'rb') as form:
             tax_data = bytearray(form.read())
 
