@@ -51,6 +51,7 @@ bool update_setting(user_account* ua, const char *index, const char *value) {
     v = strtol(value, &endptr, 10);
     if (*endptr)
         return false;
-    ua->setting[i] = v;
+    if (i > -1 && i < SETTINGS_COUNT)
+        ua->setting[i] = v;
     return true;
 }
